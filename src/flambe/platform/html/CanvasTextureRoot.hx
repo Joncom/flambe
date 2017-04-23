@@ -121,6 +121,13 @@ class CanvasTextureRoot extends BasicAsset<CanvasTextureRoot>
 
     override private function onDisposed ()
     {
+        // Free image from memory immediately if running in Cocoon/CocoonJS:
+        // https://docs.cocoon.io/article/memory-management-tips/
+        if(untyped __js__('typeof({0})', image.dispose) == "function")
+        {
+            image.dispose();
+        }
+
         image = null;
         _graphics = null;
     }
