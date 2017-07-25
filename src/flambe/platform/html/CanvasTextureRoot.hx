@@ -51,7 +51,7 @@ class CanvasTextureRoot extends BasicAsset<CanvasTextureRoot>
         var ctx2d = getContext2d();
         var imageData = ctx2d.createImageData(sourceW, sourceH);
         var data :Dynamic = imageData.data;
-        if (data.set != null) {
+        if (false && data.set != null) { // data.set temporarily disabled (false &&) because unreliable
             // Data is a Uint8ClampedArray, copy it in one swoop
             data.set(pixels.getData());
         } else {
