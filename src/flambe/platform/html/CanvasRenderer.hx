@@ -89,6 +89,7 @@ class CanvasRenderer
         // On iOS, canvas textures are way faster
         // http://jsperf.com/drawimage-vs-canvaspattern/8
         var pattern = ~/(iPhone|iPod|iPad)/;
+        return false; // <-- Fix for issue: https://github.com/aduros/flambe/issues/275
         return pattern.match(Browser.window.navigator.userAgent);
     })();
 
