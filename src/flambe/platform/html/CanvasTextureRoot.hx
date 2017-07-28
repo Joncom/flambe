@@ -123,7 +123,7 @@ class CanvasTextureRoot extends BasicAsset<CanvasTextureRoot>
     {
         // Free image from memory immediately if running in Cocoon/CocoonJS:
         // https://docs.cocoon.io/article/memory-management-tips/
-        if(untyped __js__('typeof({0})', image.dispose) == "function")
+        if(image.dispose != null)
         {
             image.dispose();
         }
