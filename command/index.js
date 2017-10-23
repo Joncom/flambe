@@ -10,6 +10,7 @@ var os = require("os");
 var path = require("path");
 var spawn = require("child_process").spawn;
 var wrench = require("wrench");
+var Rsync = require('rsync');
 
 var DATA_DIR = __dirname + "/data/";
 var CACHE_DIR = "build/.cache/";
@@ -136,18 +137,32 @@ exports.build = function (config, platforms, opts) {
     var srcPaths = getAllPaths(config, "src");
     var webPaths = getAllPaths(config, "web");
 
+    // TODO: Build to temp. dir, then sync with using --delete option for cleaner output-dir
+    var sync = function(source, destination) {
+        var rsync = new Rsync().flags('a').source(source).destination(destination);
+        return Q.Promise(function(resolve, reject, notify) {
+            rsync.execute(function(error, code, cmd) {
+                if(error) {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    };
+
     var _preparedWeb = false;
     var prepareWeb = function () {
         if (!_preparedWeb) {
             _preparedWeb = true;
 
             wrench.mkdirSyncRecursive("build/web/targets");
-            copyFileSync(DATA_DIR+"flambe.js", "build/web/flambe.js");
 
-            return copyDirs(webPaths, "build/web", {includeHidden: true})
+            return sync(DATA_DIR+"flambe.js", "build/web/flambe.js")
+            .then(sync(webPaths+"/", "build/web"))
             .then(function () {
                 if (fs.existsSync("icons")) {
-                    return copyDirs("icons", "build/web/icons");
+                    return sync("icons/", "build/web/icons");
                 }
             });
         }
@@ -155,9 +170,8 @@ exports.build = function (config, platforms, opts) {
     };
 
     var prepareAssets = function (dest) {
-        wrench.rmdirSyncRecursive(dest, true);
         // TODO(bruno): Filter out certain formats based on the platform
-        return copyDirs(assetPaths, dest)
+        return sync(assetPaths+"/", dest)
         .then(function () {
             return ["--macro", "flambe.platform.ManifestBuilder.use(\""+dest+"\")"];
         });
