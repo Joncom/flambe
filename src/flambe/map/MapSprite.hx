@@ -76,7 +76,7 @@ class MapSprite extends Sprite
 
 	override public function draw (g :Graphics)
 	{
-		g.applyScissor( 0, 0, width._, height._);
+		// g.applyScissor( 0, 0, width._, height._); // Breaks rendering if map gets rotated
 	}
 
 	override public function getNaturalWidth () :Float
