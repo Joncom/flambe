@@ -49,11 +49,7 @@ using flambe.util.BitSets;
 
     public function new ()
     {
-#if flash
-        _compMap = cast new flash.utils.Dictionary();
-#elseif js
-        _compMap = {};
-#end
+
     }
 
     /**
@@ -75,7 +71,7 @@ using flambe.util.BitSets;
             remove(prev);
         }
 
-        untyped _compMap[name] = component;
+        _compMap.set(name, component);
 
         // Append it to the component list
         var tail = null, p = firstComponent;
@@ -115,11 +111,7 @@ using flambe.util.BitSets;
                 }
 
                 // Remove it from the _compMap
-#if flash
-                untyped __delete__(_compMap, p.name);
-#elseif js
-                untyped __js__("delete")(_compMap[p.name]);
-#end
+                _compMap.remove(p.name);
 
                 // Notify the component it was removed
                 if (p._flags.contains(Component.STARTED)) {
@@ -208,7 +200,7 @@ using flambe.util.BitSets;
      */
     inline public function getComponent (name :String) :Component
     {
-        return untyped _compMap[name];
+        return _compMap.get(name);
     }
 
     /**
@@ -423,6 +415,7 @@ using flambe.util.BitSets;
     /**
      * Maps String -> Component. Usually you would use a Haxe Map here, but I'm dropping down to plain
      * Object/Dictionary for the quickest possible lookups in this critical part of Flambe.
+     * Note from Joncom: Converted to Haxe Map so that it can compile to CPP target.
      */
-    private var _compMap :Dynamic<Component>;
+    private var _compMap :Map<String, Component> = new Map();
 }

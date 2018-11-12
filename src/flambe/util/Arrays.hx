@@ -37,7 +37,11 @@ class Arrays
         // This trick only works in Flash and JS
         return untyped __new__(Array, length);
 #else
-        #error "Arrays.create unimplemented on this target"
+        // #error "Arrays.create unimplemented on this target"
+        // FIXME(Joncom): Does this hack actually work? https://stackoverflow.com/a/34714388/1609607
+        var arr = new Array();
+        arr[ length - 1 ] = null;
+        return arr;
 #end
     }
 
@@ -48,7 +52,9 @@ class Arrays
         // This trick only works in Flash and JS
         (untyped arr).length = length;
 #else
-        #error "Arrays.resize unimplemented on this target"
+        // #error "Arrays.resize unimplemented on this target"
+        var last = length - 1;
+        arr.splice(last, length - last);
 #end
     }
 
@@ -57,7 +63,8 @@ class Arrays
 #if (flash || js)
         return (untyped arr).indexOf(element, fromIndex);
 #else
-        #error "Arrays.indexOf unimplemented on this target"
+        // #error "Arrays.indexOf unimplemented on this target"
+        return arr.indexOf(element, fromIndex);
 #end
     }
 
@@ -66,7 +73,8 @@ class Arrays
 #if (flash || js)
         return (untyped arr).lastIndexOf(element, fromIndex);
 #else
-        #error "Arrays.lastIndexOf unimplemented on this target"
+        // #error "Arrays.lastIndexOf unimplemented on this target"
+        return arr.lastIndexOf(element, fromIndex);
 #end
     }
 }
